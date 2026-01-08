@@ -10,14 +10,14 @@ const bot = new TelegramBot(token, { polling: true });
 const userSessions = new Map();
 
 // Обробка /start з deep link
-bot.onText(/\/start(.*)/, async (msg, match) => {
+bot.onText(/^\/start(?:\s+(.+))?$/, async (msg, match) => {
     const chatId = msg.chat.id;
-    const clientId = match[1].trim();
-    
+    const clientId = match[1]; // тут або undefined, або ID
+
     if (clientId) {
-        userSessions.set(chatId, { clientId: clientId });
-        
-        await bot.sendMessage(chatId, 
+        userSessions.set(chatId, { clientId });
+
+        await bot.sendMessage(chatId,
             `Вітаємо! 👋\n\n` +
             `Ви зареєструвалися на курс AI Майстер-Клас.\n\n` +
             `Ваш ID: <code>${clientId}</code>\n\n` +
@@ -26,7 +26,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
             { parse_mode: 'HTML' }
         );
     } else {
-        await bot.sendMessage(chatId, 
+        await bot.sendMessage(chatId,
             '👋 Для початку перейдіть за посиланням з email або з сайту neurolab.fun'
         );
     }
@@ -78,18 +78,14 @@ bot.on('callback_query', async (query) => {
     if (action === 'approve') {
         // Надіслати клієнту
         await bot.sendMessage(chatId, 
-        '🎉 <b>Оплата підтверджена!</b>\n\n' +
-        'Дякую за оплату! Старт курсу <b>02.02.26</b>. Напередодні старту курсу я додам вас в закриту групу ТГ, де будуть всі матеріали та подальша інформація. ☺️\n\n' +
-        'А поки ви очікуєте старт курсу, ви можете вже зараз приєднатися у мій закритий ТГ-канал, де вже є багато безкоштовної інформації та однодумців. ♥️',
-        { 
-            parse_mode: 'HTML',
-            reply_markup: {
-                inline_keyboard: [[
-                    { text: '💬 Приєднатися до каналу', url: 'https://t.me/+AFbdgWuqG8UxMTVi' }
-                ]]
-            }
-        }
-    );
+            '🎉 <b>Оплата підтверджена!</b>\n\n' +
+            '✅ Ваш доступ до курсу активовано.\n\n' +
+            '📚 <b>Посилання на курс:</b>\n' +
+            'https://neurolab.fun/course\n\n' +
+            '📧 Логін та пароль надіслано на ваш email.\n\n' +
+            'Гарного навчання! 🚀',
+            { parse_mode: 'HTML' }
+        );
         
         // Відповісти адміну
         await bot.answerCallbackQuery(query.id, { 
