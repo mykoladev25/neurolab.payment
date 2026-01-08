@@ -1,0 +1,25 @@
+{
+  "name": "neurolab-payment-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mykoladev25/neurolab.payment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mykoladev25/neurolab.payment/issues"
+  },
+  "homepage": "https://github.com/mykoladev25/neurolab.payment#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "node-telegram-bot-api": "^0.67.0"
+  }
+}
