@@ -2,7 +2,10 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.BOT_TOKEN;
-const adminId = process.env.ADMIN_TELEGRAM_ID;
+const adminIds = [
+    process.env.ADMIN_TELEGRAM_ID,
+    process.env.ADMIN_TELEGRAM_ID_2
+].filter(Boolean);
 
 const bot = new TelegramBot(token, { polling: true });
 
@@ -47,22 +50,24 @@ bot.on('photo', async (msg) => {
     const photo = msg.photo[msg.photo.length - 1];
     const userName = msg.from.first_name + (msg.from.last_name ? ' ' + msg.from.last_name : '');
     
-    // Надіслати адміну з кнопками
-    await bot.sendPhoto(adminId, photo.file_id, {
-        caption: 
-            `💰 <b>Підтвердження оплати</b>\n\n` +
-            `👤 <b>Від:</b> ${userName}\n` +
-            `🆔 <b>Client ID:</b> <code>${session.clientId}</code>\n` +
-            `👤 <b>Telegram:</b> @${msg.from.username || 'немає username'}\n` +
-            `📱 <b>Chat ID:</b> <code>${chatId}</code>`,
-        parse_mode: 'HTML',
-        reply_markup: {
-            inline_keyboard: [[
-                { text: '✅ Підтвердити оплату', callback_data: `approve_${chatId}_${session.clientId}` },
-                { text: '❌ Відхилити', callback_data: `reject_${chatId}_${session.clientId}` }
-            ]]
-        }
-    });
+    // Надіслати адмінам запит на верифікацію з кнопками
+    for (const adminId of adminIds) {
+        await bot.sendPhoto(adminId, photo.file_id, {
+            caption: 
+                `💰 <b>Підтвердження оплати</b>\n\n` +
+                `👤 <b>Від:</b> ${userName}\n` +
+                `🆔 <b>Client ID:</b> <code>${session.clientId}</code>\n` +
+                `👤 <b>Telegram:</b> @${msg.from.username || 'немає username'}\n` +
+                `📱 <b>Chat ID:</b> <code>${chatId}</code>`,
+            parse_mode: 'HTML',
+            reply_markup: {
+                inline_keyboard: [[
+                    { text: '✅ Підтвердити оплату', callback_data: `approve_${chatId}_${session.clientId}` },
+                    { text: '❌ Відхилити', callback_data: `reject_${chatId}_${session.clientId}` }
+                ]]
+            }
+        });
+    }
     
     await bot.sendMessage(chatId, 
         '✅ Дякуємо! Скріншот отримано.\n\n' +
